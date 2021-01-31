@@ -1,0 +1,1 @@
+module "modern-web-with-go"
