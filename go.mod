@@ -1,3 +1,3 @@
-module modern-web-with-go
+module github.com/whoiswentz/modern-web-with-go
 
 go 1.15

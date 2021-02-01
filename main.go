@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
-	"html/template"
+	"github.com/whoiswentz/modern-web-with-go/config"
+	"github.com/whoiswentz/modern-web-with-go/handlers"
+	"github.com/whoiswentz/modern-web-with-go/helpers"
 	"log"
 	"net/http"
 )
@@ -10,8 +12,17 @@ import (
 const portNumber = ":8080"
 
 func main() {
-	http.HandleFunc("/", Home)
-	http.HandleFunc("/about", About)
+	var appConfig config.AppConfig
+
+	tc, err := helpers.CreateTemplateCache()
+	if err != nil {
+		log.Fatalln("cannot create template cache", err)
+	}
+
+	appConfig.TemplateCache = tc
+
+	http.HandleFunc("/", handlers.Home)
+	http.HandleFunc("/about", handlers.About)
 
 	log.Println(fmt.Sprintf("startin app on port %s", portNumber))
 	if err := http.ListenAndServe(portNumber, nil); err != nil {
@@ -19,21 +30,3 @@ func main() {
 	}
 }
 
-func Home(w http.ResponseWriter, r *http.Request) {
-	renderTemplate(w, "home.page.html")
-}
-
-func About(w http.ResponseWriter, r *http.Request) {
-	renderTemplate(w, "about.page.html")
-}
-
-func renderTemplate(w http.ResponseWriter, file string) {
-	filePath := fmt.Sprintf("./templates/%s", file)
-	parsedTemplate, err := template.ParseFiles(filePath)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	if err := parsedTemplate.Execute(w, nil); err != nil {
-		log.Println("error parsing template: ", err)
-	}
-}
