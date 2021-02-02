@@ -2,30 +2,42 @@ package main
 
 import (
 	"fmt"
-	"github.com/whoiswentz/modern-web-with-go/config"
-	"github.com/whoiswentz/modern-web-with-go/handlers"
-	"github.com/whoiswentz/modern-web-with-go/helpers"
+	"github.com/gorilla/mux"
+	"github.com/whoiswentz/modern-web-with-go/controllers"
+	"github.com/whoiswentz/modern-web-with-go/middlewares"
 	"log"
 	"net/http"
+	"time"
 )
 
-const portNumber = ":8080"
+const (
+	portNumber = ":8080"
+	readHeaderTimeout = 1 * time.Second
+	writeTimeout      = 10 * time.Second
+	idleTimeout       = 90 * time.Second
+	maxHeaderBytes    = http.DefaultMaxHeaderBytes
+)
 
 func main() {
-	var appConfig config.AppConfig
+	appController := controllers.NewApplicationController()
 
-	tc, err := helpers.CreateTemplateCache()
-	if err != nil {
-		log.Fatalln("cannot create template cache", err)
+	router := mux.NewRouter()
+	router.Use(middlewares.WriteToConsole)
+
+	router.HandleFunc("/", appController.Home)
+	router.HandleFunc("/about", appController.About)
+
+	srv := &http.Server{
+		Addr:              portNumber,
+		Handler:           router,
+		ReadHeaderTimeout: readHeaderTimeout,
+		WriteTimeout:      writeTimeout,
+		IdleTimeout:       idleTimeout,
+		MaxHeaderBytes:    maxHeaderBytes,
 	}
 
-	appConfig.TemplateCache = tc
-
-	http.HandleFunc("/", handlers.Home)
-	http.HandleFunc("/about", handlers.About)
-
-	log.Println(fmt.Sprintf("startin app on port %s", portNumber))
-	if err := http.ListenAndServe(portNumber, nil); err != nil {
+	log.Println(fmt.Sprintf("startint app on port %s", portNumber))
+	if err := srv.ListenAndServe(); err != nil {
 		log.Panic(err)
 	}
 }

@@ -12,20 +12,24 @@ import (
 const templatesFolder = "./templates"
 
 var functions = template.FuncMap{}
+var templates map[string]*template.Template
 
-func RenderTemplate(w http.ResponseWriter, file string, data interface{}) {
-	tc, err := CreateTemplateCache()
+func init() {
+	tmpls, err := createTemplateCache()
 	if err != nil {
 		log.Fatal(err)
 	}
+	templates = tmpls
+}
 
-	t, ok := tc[file]
+func RenderTemplate(w http.ResponseWriter, file string, data interface{}) {
+	tmpl, ok := templates[file]
 	if !ok {
 		log.Fatalln("template not found")
 	}
 
 	buf := new(bytes.Buffer)
-	if err := t.Execute(buf, data); err != nil {
+	if err := tmpl.Execute(buf, data); err != nil {
 		log.Fatalln(err)
 	}
 
@@ -34,7 +38,7 @@ func RenderTemplate(w http.ResponseWriter, file string, data interface{}) {
 	}
 }
 
-func CreateTemplateCache() (map[string]*template.Template, error) {
+func createTemplateCache() (map[string]*template.Template, error) {
 	pagesPath := fmt.Sprintf("%s/%s", templatesFolder,"*.page.gohtml")
 	basesPath := fmt.Sprintf("%s/%s", templatesFolder,"*.layout.gohtml")
 
