@@ -6,6 +6,6 @@ import (
 )
 
 func SessionLoader(next http.Handler) http.Handler {
-	return config.ApplicationConfig.Session.LoadAndSave(next)
+	return config.GetAppConfig().Session.LoadAndSave(next)
 }
 

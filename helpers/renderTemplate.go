@@ -8,7 +8,7 @@ import (
 )
 
 func RenderTemplate(w http.ResponseWriter, file string, data interface{}) {
-	tmpl, ok := config.ApplicationConfig.Templates[file]
+	tmpl, ok := config.GetAppConfig().Templates[file]
 	if !ok {
 		log.Fatalln("template not found")
 	}

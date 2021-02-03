@@ -6,10 +6,10 @@ import (
 	"log"
 )
 
-var ApplicationConfig *appConfig
+var applicationConfig *appConfig
 
 func init() {
-	ApplicationConfig = newAppConfig()
+	applicationConfig = newAppConfig()
 }
 
 type appConfig struct {
@@ -27,4 +27,8 @@ func newAppConfig() *appConfig {
 		Templates: tmpls,
 		Session: createSession(),
 	}
+}
+
+func GetAppConfig() *appConfig {
+	return applicationConfig
 }
