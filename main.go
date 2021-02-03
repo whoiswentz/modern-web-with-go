@@ -23,6 +23,7 @@ func main() {
 
 	router := mux.NewRouter()
 	router.Use(middlewares.WriteToConsole)
+	router.Use(middlewares.SessionLoader)
 
 	router.HandleFunc("/", appController.Home)
 	router.HandleFunc("/about", appController.About)

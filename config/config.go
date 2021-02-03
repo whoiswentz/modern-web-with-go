@@ -1,14 +1,30 @@
 package config
 
 import (
+	"github.com/alexedwards/scs/v2"
 	"html/template"
+	"log"
 )
 
-type AppConfig struct {
-	TemplateCache map[string]*template.Template
+var ApplicationConfig *appConfig
+
+func init() {
+	ApplicationConfig = newAppConfig()
 }
 
-func NewAppConfig() *AppConfig {
-	return &AppConfig{}
+type appConfig struct {
+	Templates map[string]*template.Template
+	Session *scs.SessionManager
 }
 
+func newAppConfig() *appConfig {
+	tmpls, err := createTemplateCache()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return &appConfig{
+		Templates: tmpls,
+		Session: createSession(),
+	}
+}
